@@ -41,56 +41,10 @@ mysqli_close($link);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User List</title>
+    <title>Список пользователей</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        body {
-            padding: 20px;
-        }
-        .table {
-            margin-top: 20px;
-        }
-        .btn {
-            margin-right: 5px;
-        }
-        .sidebar {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 100;
-            padding: 48px 0 0;
-            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-        }
-        .sidebar-sticky {
-            position: relative;
-            top: 0;
-            height: calc(100vh - 48px);
-            padding-top: .5rem;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-        .sidebar .nav-link {
-            font-weight: 500;
-            color: #333;
-        }
-        .sidebar .nav-link .feather {
-            margin-right: 4px;
-            color: #999;
-        }
-        .sidebar .nav-link.active {
-            color: #007bff;
-        }
-        .sidebar .nav-link:hover .feather,
-        .sidebar .nav-link.active .feather {
-            color: inherit;
-        }
-        .sidebar-heading {
-            font-size: .75rem;
-            text-transform: uppercase;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -100,31 +54,36 @@ mysqli_close($link);
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#usersTab" data-toggle="tab">
+                            <a class="nav-link active" href="#usersTab" data-toggle="tab" data-title="Список пользователей">
                                 <i class="fas fa-users"></i> Пользователи
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#clientsTab" data-toggle="tab">
+                            <a class="nav-link" href="#clientsTab" data-toggle="tab" data-title="Список клиентов">
                                 <i class="fas fa-user"></i> Клиенты
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#goodsTab" data-toggle="tab">
+                            <a class="nav-link" href="#goodsTab" data-toggle="tab" data-title="Список товаров">
                                 <i class="fas fa-box"></i> Товары
                             </a>
                         </li>
                     </ul>
+                    <div class="mt-auto">
+                        <button class="btn btn-primary btn-block" type="button" id="toggleSidebar">
+                            <i class="fas fa-bars"></i> Свернуть/Развернуть
+                        </button>
+                        <button class="btn btn-secondary btn-block" type="button" id="toggleTheme">
+                            <i class="fas fa-adjust"></i> Переключить тему
+                        </button>
+                    </div>
                 </div>
             </nav>
 
             <!-- Основной контент -->
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Список пользователей</h1>
-                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#sidebar" aria-expanded="false" aria-controls="sidebar">
-                        <i class="fas fa-bars"></i>
-                    </button>
+                    <h1 class="h2" id="pageTitle">Список пользователей</h1>
                 </div>
 
                 <div class="tab-content" id="nav-tabContent">
@@ -210,6 +169,7 @@ mysqli_close($link);
 
                     <!-- Вкладка Товары -->
                     <div class="tab-pane fade" id="goodsTab" role="tabpanel">
+                        <p><a href="#" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addGoodModal">Добавить новый товар</a></p>
                         <?php
                         include 'connect.php';
                         $sql = "SELECT * FROM goods";
@@ -229,15 +189,15 @@ mysqli_close($link);
                                     </thead>
                                     <tbody>";
                             while($row = mysqli_fetch_assoc($goods)) {
-                                echo "<tr id='client_" . $row["id"] . "'>
+                                echo "<tr id='good_" . $row["id"] . "'>
                                         <td>" . $row["id"] . "</td>
                                         <td>" . $row["name"] . "</td>
                                         <td>" . $row["organization"] . "</td>
                                         <td>" . $row["cost"] . "</td>
                                         <td>" . $row["dataid"] . "</td>
                                         <td>
-                                            <a href='edit.php?id=" . $row["id"] . "' class='btn btn-sm btn-warning ml-2'>Редактировать</a> 
-                                            <button class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-table='clients' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
+                                            <button type='button' class='btn btn-sm btn-warning ml-2 edit-good-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#editGoodModal'>Редактировать</button> 
+                                            <button class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-table='goods' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
                                         </td>
                                     </tr>";
                             }
@@ -342,16 +302,126 @@ mysqli_close($link);
         </div>
     </div>
 
+    <!-- Модальное окно для добавления товара -->
+    <div class="modal fade" id="addGoodModal" tabindex="-1" role="dialog" aria-labelledby="addGoodModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addGoodModalLabel">Добавить новый товар</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addGoodForm" method="post">
+                        <div class="form-group">
+                            <label for="name">Название</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="organization">Организация</label>
+                            <input type="text" class="form-control" id="organization" name="organization" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cost">Стоимость</label>
+                            <input type="text" class="form-control" id="cost" name="cost" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataid">Уникальный номер</label>
+                            <input type="text" class="form-control" id="dataid" name="dataid" required>
+                        </div>
+                        <input type="hidden" name="add_good" value="1">
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования товара -->
+    <div class="modal fade" id="editGoodModal" tabindex="-1" role="dialog" aria-labelledby="editGoodModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editGoodModalLabel">Редактировать товар</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editGoodForm" method="post">
+                        <div class="form-group">
+                            <label for="edit_name">Название</label>
+                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_organization">Организация</label>
+                            <input type="text" class="form-control" id="edit_organization" name="organization" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_cost">Стоимость</label>
+                            <input type="text" class="form-control" id="edit_cost" name="cost" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_dataid">Уникальный номер</label>
+                            <input type="text" class="form-control" id="edit_dataid" name="dataid" required>
+                        </div>
+                        <input type="hidden" id="edit_id" name="edit_id" value="">
+                        <input type="hidden" name="edit_good" value="1">
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Управление кнопкой для сворачивания/разворачивания панели навигации
+            $('#toggleSidebar').click(function() {
+                $('#sidebar').toggleClass('collapse');
+            });
+
+            // Изменение заголовка страницы при переключении вкладок
+            $('.nav-link').click(function() {
+                var title = $(this).data('title');
+                $('#pageTitle').text(title);
+            });
+
+            // Управление модальным окном удаления
             $('.delete-btn').click(function() {
                 var userId = $(this).data('id');
                 var table = $(this).data('table');
                 $('#delete_id').val(userId);
                 $('#delete_table').val(table);
+            });
+
+            // Управление модальным окном редактирования товара
+            $('.edit-good-btn').click(function() {
+                var goodId = $(this).data('id');
+                $.ajax({
+                    url: 'get_good.php',
+                    type: 'POST',
+                    data: { id: goodId },
+                    success: function(response) {
+                        var good = JSON.parse(response);
+                        $('#edit_id').val(good.id);
+                        $('#edit_name').val(good.name);
+                        $('#edit_organization').val(good.organization);
+                        $('#edit_cost').val(good.cost);
+                        $('#edit_dataid').val(good.dataid);
+                    }
+                });
+            });
+
+            // Переключение темной и светлой темы
+            $('#toggleTheme').click(function() {
+                $('body').toggleClass('bg-dark text-white');
+                $('.table').toggleClass('table-dark');
+                $('.thead-dark').toggleClass('thead-light');
             });
         });
     </script>
