@@ -39,7 +39,9 @@ if (isset($_POST['add_good'])) {
     $organization = mysqli_real_escape_string($link, $_POST['organization']);
     $cost = mysqli_real_escape_string($link, $_POST['cost']);
     $dataid = mysqli_real_escape_string($link, $_POST['dataid']);
-    $sql = "INSERT INTO goods (name, organization, cost, dataid) VALUES ('$name', '$organization', '$cost', '$dataid')";
+    $image = mysqli_real_escape_string($link, $_POST['image']);
+    $description = mysqli_real_escape_string($link, $_POST['description']);
+    $sql = "INSERT INTO goods (name, organization, cost, dataid, image, description) VALUES ('$name', '$organization', '$cost', '$dataid', '$image', '$description')";
     mysqli_query($link, $sql);
     header("Location: index.php"); // Перенаправление на текущую страницу для обновления списка товаров
     exit();
@@ -76,7 +78,9 @@ if (isset($_POST['edit_good'])) {
     $organization = mysqli_real_escape_string($link, $_POST['organization']);
     $cost = mysqli_real_escape_string($link, $_POST['cost']);
     $dataid = mysqli_real_escape_string($link, $_POST['dataid']);
-    $sql = "UPDATE goods SET name = '$name', organization = '$organization', cost = '$cost', dataid = '$dataid' WHERE id = '$id'";
+    $image = mysqli_real_escape_string($link, $_POST['image']);
+    $description = mysqli_real_escape_string($link, $_POST['description']);
+    $sql = "UPDATE goods SET name = '$name', organization = '$organization', cost = '$cost', dataid = '$dataid', image = '$image', description = '$description' WHERE id = '$id'";
     mysqli_query($link, $sql);
     header("Location: index.php"); // Перенаправление на текущую страницу для обновления списка товаров
     exit();
@@ -138,7 +142,7 @@ mysqli_close($link);
                 <div class="tab-content" id="nav-tabContent">
                     <!-- Вкладка Пользователи -->
                     <div class="tab-pane fade show active" id="usersTab" role="tabpanel">
-                        <p><a href="#" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addModal" data-table="users">Добавить нового пользователя</a></p>
+                        <p><a href="#" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addUserModal">Добавить нового пользователя</a></p>
                         <?php
                         include 'connect.php';
                         $sql = "SELECT * FROM users";
@@ -163,8 +167,8 @@ mysqli_close($link);
                                         <td>" . $row["password"] . "</td>
                                         <td>" . $row["role"] . "</td>
                                         <td>
-                                            <button type='button' class='btn btn-sm btn-warning ml-2 edit-btn' data-id='" . $row["id"] . "' data-table='users' data-toggle='modal' data-target='#editModal'>Редактировать</button> 
-                                            <button type='button' class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-table='users' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
+                                            <button type='button' class='btn btn-sm btn-warning ml-2 edit-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#editUserModal'>Редактировать</button> 
+                                            <button type='button' class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
                                         </td>
                                     </tr>";
                             }
@@ -178,7 +182,7 @@ mysqli_close($link);
 
                     <!-- Вкладка Клиенты -->
                     <div class="tab-pane fade" id="clientsTab" role="tabpanel">
-                        <p><a href="#" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addModal" data-table="clients">Добавить нового клиента</a></p>
+                        <p><a href="#" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addClientModal">Добавить нового клиента</a></p>
                         <?php
                         include 'connect.php';
                         $sql = "SELECT * FROM clients";
@@ -203,8 +207,8 @@ mysqli_close($link);
                                         <td>" . $row["surname"] . "</td>
                                         <td>" . $row["firstname"] . "</td>
                                         <td>
-                                            <button type='button' class='btn btn-sm btn-warning ml-2 edit-btn' data-id='" . $row["id"] . "' data-table='clients' data-toggle='modal' data-target='#editModal'>Редактировать</button> 
-                                            <button class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-table='clients' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
+                                            <button type='button' class='btn btn-sm btn-warning ml-2 edit-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#editClientModal'>Редактировать</button> 
+                                            <button class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
                                         </td>
                                     </tr>";
                             }
@@ -218,7 +222,7 @@ mysqli_close($link);
 
                     <!-- Вкладка Товары -->
                     <div class="tab-pane fade" id="goodsTab" role="tabpanel">
-                        <p><a href="#" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addModal" data-table="goods">Добавить новый товар</a></p>
+                        <p><a href="#" class="btn btn-primary mb-3" data-toggle="modal" data-target="#addGoodModal">Добавить новый товар</a></p>
                         <?php
                         include 'connect.php';
                         $sql = "SELECT * FROM goods";
@@ -245,8 +249,9 @@ mysqli_close($link);
                                         <td>" . $row["cost"] . "</td>
                                         <td>" . $row["dataid"] . "</td>
                                         <td>
-                                            <button type='button' class='btn btn-sm btn-warning ml-2 edit-btn' data-id='" . $row["id"] . "' data-table='goods' data-toggle='modal' data-target='#editModal'>Редактировать</button> 
-                                            <button class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-table='goods' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
+                                            <button type='button' class='btn btn-sm btn-warning ml-2 edit-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#editGoodModal'>Редактировать</button> 
+                                            <button class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
+                                            <button class='btn btn-sm btn-info ml-2 detail-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#detailModal'>Подробнее</button>
                                         </td>
                                     </tr>";
                             }
@@ -287,44 +292,236 @@ mysqli_close($link);
         </div>
     </div>
 
-    <!-- Универсальное модальное окно для добавления данных -->
-    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <!-- Модальное окно для добавления пользователя -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addModalLabel">Добавить новый элемент</h5>
+                    <h5 class="modal-title" id="addUserModalLabel">Добавить нового пользователя</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="addForm" method="post">
-                        <div id="addFormFields"></div>
-                        <input type="hidden" id="add_table" name="add_table" value="">
-                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    <form id="addUserForm" method="post">
+                        <div class="form-group">
+                            <label for="login">Login</label>
+                            <input type="text" class="form-control" id="login" name="login" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="role">Role</label>
+                            <input type="text" class="form-control" id="role" name="role" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" name="add_user">Добавить</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Универсальное модальное окно для редактирования данных -->
-    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <!-- Модальное окно для редактирования пользователя -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Редактировать элемент</h5>
+                    <h5 class="modal-title" id="editUserModalLabel">Редактировать пользователя</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="post">
-                        <div id="editFormFields"></div>
-                        <input type="hidden" id="edit_id" name="edit_id" value="">
-                        <input type="hidden" id="edit_table" name="edit_table" value="">
-                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <form id="editUserForm" method="post">
+                        <input type="hidden" id="edit_user_id" name="edit_id" value="">
+                        <div class="form-group">
+                            <label for="edit_login">Login</label>
+                            <input type="text" class="form-control" id="edit_login" name="login" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_password">Password</label>
+                            <input type="password" class="form-control" id="edit_password" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_role">Role</label>
+                            <input type="text" class="form-control" id="edit_role" name="role" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" name="edit_user">Сохранить</button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления клиента -->
+    <div class="modal fade" id="addClientModal" tabindex="-1" role="dialog" aria-labelledby="addClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addClientModalLabel">Добавить нового клиента</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addClientForm" method="post">
+                        <div class="form-group">
+                            <label for="name">Имя</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="surname">Фамилия</label>
+                            <input type="text" class="form-control" id="surname" name="surname" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="firstname">Отчество</label>
+                            <input type="text" class="form-control" id="firstname" name="firstname" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" name="add_client">Добавить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования клиента -->
+    <div class="modal fade" id="editClientModal" tabindex="-1" role="dialog" aria-labelledby="editClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editClientModalLabel">Редактировать клиента</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editClientForm" method="post">
+                        <input type="hidden" id="edit_client_id" name="edit_id" value="">
+                        <div class="form-group">
+                            <label for="edit_name">Имя</label>
+                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_surname">Фамилия</label>
+                            <input type="text" class="form-control" id="edit_surname" name="surname" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_firstname">Отчество</label>
+                            <input type="text" class="form-control" id="edit_firstname" name="firstname" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" name="edit_client">Сохранить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления товара -->
+    <div class="modal fade" id="addGoodModal" tabindex="-1" role="dialog" aria-labelledby="addGoodModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addGoodModalLabel">Добавить новый товар</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addGoodForm" method="post">
+                        <div class="form-group">
+                            <label for="name">Название</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="organization">Организация</label>
+                            <input type="text" class="form-control" id="organization" name="organization" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cost">Стоимость</label>
+                            <input type="text" class="form-control" id="cost" name="cost" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dataid">Уникальный номер</label>
+                            <input type="text" class="form-control" id="dataid" name="dataid" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="image">Изображение</label>
+                            <input type="text" class="form-control" id="image" name="image" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Описание</label>
+                            <input type="text" class="form-control" id="description" name="description" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" name="add_good">Добавить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования товара -->
+    <div class="modal fade" id="editGoodModal" tabindex="-1" role="dialog" aria-labelledby="editGoodModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editGoodModalLabel">Редактировать товар</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editGoodForm" method="post">
+                        <input type="hidden" id="edit_good_id" name="edit_id" value="">
+                        <div class="form-group">
+                            <label for="edit_name">Название</label>
+                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_organization">Организация</label>
+                            <input type="text" class="form-control" id="edit_organization" name="organization" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_cost">Стоимость</label>
+                            <input type="text" class="form-control" id="edit_cost" name="cost" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_dataid">Уникальный номер</label>
+                            <input type="text" class="form-control" id="edit_dataid" name="dataid" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_image">Изображение</label>
+                            <input type="text" class="form-control" id="edit_image" name="image" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_description">Описание</label>
+                            <input type="text" class="form-control" id="edit_description" name="description" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" name="edit_good">Сохранить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для просмотра деталей товара -->
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailModalLabel">Детали товара</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="detailContent">
+                        <!-- Здесь будут отображаться детали товара -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
                 </div>
             </div>
         </div>
@@ -348,144 +545,102 @@ mysqli_close($link);
 
             // Управление модальным окном удаления
             $('.delete-btn').click(function() {
-                var userId = $(this).data('id');
-                var table = $(this).data('table');
-                $('#delete_id').val(userId);
+                var id = $(this).data('id');
+                var table = $(this).closest('table').data('table');
+                $('#delete_id').val(id);
                 $('#delete_table').val(table);
             });
 
-            // Универсальное модальное окно для добавления данных
-            $('#addModal').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget);
-                var table = button.data('table');
-                var modal = $(this);
-                modal.find('#add_table').val(table);
-                modal.find('#addFormFields').empty();
-
-                if (table === 'users') {
-                    modal.find('#addModalLabel').text('Добавить нового пользователя');
-                    modal.find('#addFormFields').append(`
-                        <div class="form-group">
-                            <label for="login">Login</label>
-                            <input type="text" class="form-control" id="login" name="login" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="role">Role</label>
-                            <input type="text" class="form-control" id="role" name="role" required>
-                        </div>
-                    `);
-                } else if (table === 'clients') {
-                    modal.find('#addModalLabel').text('Добавить нового клиента');
-                    modal.find('#addFormFields').append(`
-                        <div class="form-group">
-                            <label for="name">Имя</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="surname">Фамилия</label>
-                            <input type="text" class="form-control" id="surname" name="surname" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="firstname">Отчество</label>
-                            <input type="text" class="form-control" id="firstname" name="firstname" required>
-                        </div>
-                    `);
-                } else if (table === 'goods') {
-                    modal.find('#addModalLabel').text('Добавить новый товар');
-                    modal.find('#addFormFields').append(`
-                        <div class="form-group">
-                            <label for="name">Название</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="organization">Организация</label>
-                            <input type="text" class="form-control" id="organization" name="organization" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="cost">Стоимость</label>
-                            <input type="text" class="form-control" id="cost" name="cost" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="dataid">Уникальный номер</label>
-                            <input type="text" class="form-control" id="dataid" name="dataid" required>
-                        </div>
-                    `);
-                }
-            });
-
-            // Универсальное модальное окно для редактирования данных
-            $('#editModal').on('show.bs.modal', function(event) {
+            // Заполнение модального окна для редактирования пользователя
+            $('#editUserModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
                 var id = button.data('id');
-                var table = button.data('table');
                 var modal = $(this);
-                modal.find('#edit_id').val(id);
-                modal.find('#edit_table').val(table);
-                modal.find('#editFormFields').empty();
+                modal.find('#edit_user_id').val(id);
 
                 $.ajax({
                     url: 'get_data.php',
                     type: 'POST',
-                    data: { id: id, table: table },
+                    data: { id: id, table: 'users' },
                     success: function(response) {
                         var data = JSON.parse(response);
-                        if (table === 'users') {
-                            modal.find('#editModalLabel').text('Редактировать пользователя');
-                            modal.find('#editFormFields').append(`
-                                <div class="form-group">
-                                    <label for="login">Login</label>
-                                    <input type="text" class="form-control" id="login" name="login" value="${data.login}" required>
+                        modal.find('#edit_login').val(data.login);
+                        modal.find('#edit_password').val(data.password);
+                        modal.find('#edit_role').val(data.role);
+                    }
+                });
+            });
+
+            // Заполнение модального окна для редактирования клиента
+            $('#editClientModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                var modal = $(this);
+                modal.find('#edit_client_id').val(id);
+
+                $.ajax({
+                    url: 'get_data.php',
+                    type: 'POST',
+                    data: { id: id, table: 'clients' },
+                    success: function(response) {
+                        var data = JSON.parse(response);
+                        modal.find('#edit_name').val(data.name);
+                        modal.find('#edit_surname').val(data.surname);
+                        modal.find('#edit_firstname').val(data.firstname);
+                    }
+                });
+            });
+
+            // Заполнение модального окна для редактирования товара
+            $('#editGoodModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                var modal = $(this);
+                modal.find('#edit_good_id').val(id);
+
+                $.ajax({
+                    url: 'get_data.php',
+                    type: 'POST',
+                    data: { id: id, table: 'goods' },
+                    success: function(response) {
+                        var data = JSON.parse(response);
+                        modal.find('#edit_name').val(data.name);
+                        modal.find('#edit_organization').val(data.organization);
+                        modal.find('#edit_cost').val(data.cost);
+                        modal.find('#edit_dataid').val(data.dataid);
+                        modal.find('#edit_image').val(data.image);
+                        modal.find('#edit_description').val(data.description);
+                    }
+                });
+            });
+
+            // Заполнение модального окна для просмотра деталей товара
+            $('#detailModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                var modal = $(this);
+
+                $.ajax({
+                    url: 'get_data.php',
+                    type: 'POST',
+                    data: { id: id, table: 'goods' },
+                    success: function(response) {
+                        var data = JSON.parse(response);
+                        var content = `
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <img src="${data.image}" alt="Изображение товара" class="img-fluid">
                                 </div>
-                                <div class="form-group">
-                                    <label for="password">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" value="${data.password}" required>
+                                <div class="col-md-6">
+                                    <h5>${data.name}</h5>
+                                    <p><strong>Организация:</strong> ${data.organization}</p>
+                                    <p><strong>Стоимость:</strong> ${data.cost}</p>
+                                    <p><strong>Уникальный номер:</strong> ${data.dataid}</p>
+                                    <p><strong>Описание:</strong> ${data.description}</p>
                                 </div>
-                                <div class="form-group">
-                                    <label for="role">Role</label>
-                                    <input type="text" class="form-control" id="role" name="role" value="${data.role}" required>
-                                </div>
-                            `);
-                        } else if (table === 'clients') {
-                            modal.find('#editModalLabel').text('Редактировать клиента');
-                            modal.find('#editFormFields').append(`
-                                <div class="form-group">
-                                    <label for="name">Имя</label>
-                                    <input type="text" class="form-control" id="name" name="name" value="${data.name}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="surname">Фамилия</label>
-                                    <input type="text" class="form-control" id="surname" name="surname" value="${data.surname}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="firstname">Отчество</label>
-                                    <input type="text" class="form-control" id="firstname" name="firstname" value="${data.firstname}" required>
-                                </div>
-                            `);
-                        } else if (table === 'goods') {
-                            modal.find('#editModalLabel').text('Редактировать товар');
-                            modal.find('#editFormFields').append(`
-                                <div class="form-group">
-                                    <label for="name">Название</label>
-                                    <input type="text" class="form-control" id="name" name="name" value="${data.name}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="organization">Организация</label>
-                                    <input type="text" class="form-control" id="organization" name="organization" value="${data.organization}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="cost">Стоимость</label>
-                                    <input type="text" class="form-control" id="cost" name="cost" value="${data.cost}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="dataid">Уникальный номер</label>
-                                    <input type="text" class="form-control" id="dataid" name="dataid" value="${data.dataid}" required>
-                                </div>
-                            `);
-                        }
+                            </div>
+                        `;
+                        modal.find('#detailContent').html(content);
                     }
                 });
             });
