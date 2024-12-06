@@ -1,20 +1,17 @@
 <?php 
 include 'connect.php';
 
-// Функция для удаления
+// Функция для удаления пользователя
 if (isset($_POST['delete_id']) && isset($_POST['table'])) {
     $delete_id = mysqli_real_escape_string($link, $_POST['delete_id']);
     $table = mysqli_real_escape_string($link, $_POST['table']);
     $sql = "DELETE FROM `$table` WHERE id = '$delete_id'";
-    if (mysqli_query($link, $sql)) {
-        header("Location: index.php"); // Перенаправление на текущую страницу для обновления списка пользователей
-        exit();
-    } else {
-        echo "Ошибка при удалении записи: " . mysqli_error($link);
-    }
+    mysqli_query($link, $sql);
+    header("Location: index.php"); // Перенаправление на текущую страницу для обновления списка пользователей
+    exit();
 }
 
-// Функция для добавления
+// Функция для добавления пользователя
 if (isset($_POST['add_user'])) {
     $login = mysqli_real_escape_string($link, $_POST['login']);
     $password = mysqli_real_escape_string($link, $_POST['password']);
@@ -171,7 +168,7 @@ mysqli_close($link);
                                         <td>" . $row["role"] . "</td>
                                         <td>
                                             <button type='button' class='btn btn-sm btn-warning ml-2 edit-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#editUserModal'>Редактировать</button> 
-                                            <button type='button' class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
+                                            <button type='button' class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-table='users' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
                                         </td>
                                     </tr>";
                             }
@@ -211,7 +208,7 @@ mysqli_close($link);
                                         <td>" . $row["firstname"] . "</td>
                                         <td>
                                             <button type='button' class='btn btn-sm btn-warning ml-2 edit-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#editClientModal'>Редактировать</button> 
-                                            <button class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
+                                            <button class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-table='clients' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
                                         </td>
                                     </tr>";
                             }
@@ -253,7 +250,7 @@ mysqli_close($link);
                                         <td>" . $row["dataid"] . "</td>
                                         <td>
                                             <button type='button' class='btn btn-sm btn-warning ml-2 edit-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#editGoodModal'>Редактировать</button> 
-                                            <button class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
+                                            <button class='btn btn-sm btn-danger ml-2 delete-btn' data-id='" . $row["id"] . "' data-table='goods' data-toggle='modal' data-target='#deleteModal'>Удалить</button>
                                             <button class='btn btn-sm btn-info ml-2 detail-btn' data-id='" . $row["id"] . "' data-toggle='modal' data-target='#detailModal'>Подробнее</button>
                                         </td>
                                     </tr>";

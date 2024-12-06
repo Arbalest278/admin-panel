@@ -10,15 +10,14 @@ $(document).ready(function() {
         $('#pageTitle').text(title);
     });
 
+    // Управление модальным окном удаления
     $('.delete-btn').click(function() {
-        var id = $(this).data('id');
-        var table = $(this).closest('table').data('table');
-        $('#delete_id').val(id);
+        var userId = $(this).data('id');
+        var table = $(this).data('table');
+        console.log(userId);
+        console.log(table);
+        $('#delete_id').val(userId);
         $('#delete_table').val(table);
-        
-        // Проверка значений
-        console.log('ID:', id);
-        console.log('Table:', table);
     });
 
     // Заполнение модального окна для редактирования пользователя
